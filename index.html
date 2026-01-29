@@ -1,184 +1,442 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blockchain Explorer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .font-mono { font-family: 'Space Mono', monospace; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blockchain Explorer — Demo</title>
+
+  <!-- Tailwind CDN for quick styling (replace with your build pipeline in production) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide icons -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap');
+    :root {
+      --brand: #2563eb; /* blue-600 */
+      --muted: #6b7280; /* gray-500 */
+    }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #0f172a; }
+    .font-mono { font-family: 'Space Mono', monospace; }
+    /* small visual tweak for focus outlines to remain visible on keyboard navigation */
+    :focus { outline: 3px solid rgba(37,99,235,0.18); outline-offset: 2px; }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
-    <div id="app">
-        <!-- Home Screen -->
-        <div id="home-screen">
-            <header class="bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center">
-                <div class="flex items-center gap-2 font-bold text-xl">
-                    <i data-lucide="box" class="text-blue-600"></i>
-                    <span>Blockchain.com</span>
-                </div>
-                <div class="flex gap-4">
-                    <button class="text-sm font-medium hover:text-blue-600">Prices</button>
-                    <button class="text-sm font-medium hover:text-blue-600">Charts</button>
-                    <button class="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium">Sign In</button>
-                </div>
-            </header>
+<body class="min-h-screen">
 
-            <main class="container mx-auto px-4 py-20 text-center">
-                <div class="mb-12">
-                    <span class="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100">The #1 Blockchain Explorer</span>
-                    <h1 class="text-5xl md:text-7xl font-extrabold mt-6 mb-4 tracking-tight">Search the <span class="text-blue-600">Blockchain</span></h1>
-                    <p class="text-gray-500 text-lg max-w-2xl mx-auto">Explore transactions, addresses, and activities on the network.</p>
-                </div>
-
-                <div class="max-w-2xl mx-auto relative group">
-                    <form onsubmit="handleSearch(event)" class="relative flex items-center bg-white rounded-xl shadow-xl border border-gray-200 p-2">
-                        <div class="pl-4 pr-2 text-gray-400">
-                            <i data-lucide="search"></i>
-                        </div>
-                        <input type="text" id="address-input" placeholder="Search your address / hash" class="flex-1 px-4 py-3 text-lg outline-none font-mono">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition-all">
-                            <i data-lucide="arrow-right"></i>
-                        </button>
-                    </form>
-                </div>
-            </main>
+  <div id="app" class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i data-lucide="box" class="text-[var(--brand)] w-6 h-6"></i>
+          <div>
+            <span class="font-bold text-lg">Blockchain Explorer</span>
+            <div class="text-xs text-gray-400">Demo • Read-only</div>
+          </div>
         </div>
 
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="hidden fixed inset-0 bg-white flex flex-col items-center justify-center px-4">
-            <div class="relative w-32 h-32 mb-12">
-                <div class="absolute inset-0 border-4 border-blue-100 rounded-xl animate-[spin_8s_linear_infinite]"></div>
-                <div class="absolute inset-8 bg-blue-600 rounded-lg shadow-lg shadow-blue-200 flex items-center justify-center animate-pulse">
-                    <div class="w-3 h-3 bg-white rounded-full"></div>
-                </div>
+        <nav class="flex items-center gap-4">
+          <a class="text-sm text-gray-600 hover:text-[var(--brand)]" href="#" aria-disabled="true">Prices</a>
+          <a class="text-sm text-gray-600 hover:text-[var(--brand)]" href="#" aria-disabled="true">Charts</a>
+          <button id="signin" class="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium">Sign In</button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="container mx-auto px-4 py-12 flex-1">
+      <section id="search-section" class="text-center max-w-3xl mx-auto">
+        <span class="inline-block bg-blue-50 text-[var(--brand)] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100">Demo Explorer</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold mt-6 mb-2 tracking-tight">
+          Search the <span class="text-[var(--brand)]">Blockchain</span>
+        </h1>
+        <p class="text-gray-500 mb-6">Explore transactions, addresses, and mempool activity. This demo is read-only and will never request payments.</p>
+
+        <form id="search-form" class="max-w-2xl mx-auto" novalidate>
+          <label for="address-input" class="sr-only">Bitcoin address or transaction hash</label>
+
+          <div class="relative flex items-center bg-white rounded-xl shadow-sm border border-gray-200 p-2">
+            <div class="pl-3 pr-2 text-gray-400">
+              <i data-lucide="search"></i>
             </div>
-            <h2 id="loading-text" class="text-2xl font-bold mb-2">Resolving Address...</h2>
-            <p class="text-gray-500 mb-8 text-center">Please wait while we scan the blockchain for your transaction.</p>
-            <div class="w-full max-w-md h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div id="progress-bar" class="h-full bg-blue-600 w-0 transition-all duration-[12000ms] ease-linear"></div>
+            <input
+              id="address-input"
+              name="query"
+              class="flex-1 px-4 py-3 text-lg outline-none font-mono"
+              type="search"
+              inputmode="latin"
+              autocomplete="off"
+              placeholder="Enter Bitcoin bech32 address (e.g. bc1...) or tx hash"
+              aria-describedby="search-help"
+            />
+            <button
+              type="submit"
+              id="search-btn"
+              class="ml-3 bg-[var(--brand)] hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition"
+            >
+              <span class="sr-only">Search</span>
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <p id="search-help" class="text-xs text-gray-400 mt-2">Try the sample bech32 address: <span class="font-mono">bc1q5hrlwr0te52xc99tzq3cczx7d02nr8g25favy6</span></p>
+          <p id="search-error" class="text-sm text-rose-600 mt-2 hidden" role="alert"></p>
+        </form>
+      </section>
+
+      <!-- Loading / Progress -->
+      <section id="loading-section" class="hidden fixed inset-0 bg-white/90 z-40 flex items-center justify-center p-6">
+        <div class="max-w-md w-full text-center">
+          <div class="relative w-32 h-32 mx-auto mb-6">
+            <div class="absolute inset-0 border-4 border-blue-100 rounded-xl animate-spin"></div>
+            <div class="absolute inset-8 bg-[var(--brand)] rounded-lg shadow-lg flex items-center justify-center animate-pulse">
+              <div class="w-3 h-3 bg-white rounded-full"></div>
             </div>
-            <div class="w-full max-w-md flex justify-between mt-2 text-xs font-mono text-gray-400">
-                <span>0s</span>
-                <span>12s</span>
-            </div>
+          </div>
+
+          <h2 id="loading-text" class="text-2xl font-bold mb-2">Resolving Address…</h2>
+          <p id="loading-subtext" class="text-gray-500 mb-6">Please wait while we scan the network (read-only).</p>
+
+          <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+            <div id="progress-bar" class="h-full bg-[var(--brand)] w-0 transition-all duration-500 ease-linear" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+          </div>
+          <div class="flex justify-between text-xs font-mono text-gray-400 mt-2">
+            <span id="timer-start">0s</span>
+            <span id="timer-end">12s</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section id="results-section" class="hidden mt-10 max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <button id="back-btn" class="flex items-center text-sm text-gray-500 hover:text-[var(--brand)]">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Search
+          </button>
+          <div id="price-line" class="text-sm text-gray-600 font-mono"></div>
         </div>
 
-        <!-- Results Screen -->
-        <div id="results-screen" class="hidden min-h-screen">
-            <header class="bg-white border-b border-gray-200 py-4 px-6">
-                <button onclick="goHome()" class="flex items-center text-sm text-gray-500 hover:text-blue-600">
-                    <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Search
-                </button>
-            </header>
-            
-            <main class="container mx-auto px-4 py-8 max-w-4xl">
-                <div id="transaction-found" class="hidden space-y-8">
-                    <div class="mb-8">
-                        <h1 class="text-2xl font-bold mb-2">Search Results</h1>
-                        <p id="searched-address-display" class="text-gray-600 break-all font-mono bg-white inline-block px-3 py-1 rounded border border-gray-200"></p>
-                    </div>
+        <div id="result-found" class="hidden bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+          <div class="bg-gray-50 p-6 border-b border-gray-100 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="bg-blue-100 text-[var(--brand)] p-2 rounded-lg"><i data-lucide="box"></i></div>
+              <h3 class="font-bold text-lg">Transaction / Address Overview</h3>
+            </div>
+            <div id="status-badge" class="bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 border border-amber-200">
+              <i data-lucide="clock" class="w-4 h-4"></i> Unconfirmed
+            </div>
+          </div>
 
-                    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                        <div class="bg-gray-50 p-6 border-b border-gray-200 flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-100 text-blue-700 p-2 rounded-lg"><i data-lucide="box"></i></div>
-                                <h3 class="font-bold text-lg">Transaction Details</h3>
-                            </div>
-                            <div class="bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 border border-amber-200">
-                                <i data-lucide="clock" class="w-4 h-4 animate-pulse"></i> Action Required
-                            </div>
-                        </div>
-                        <div class="p-8 space-y-8">
-                            <div class="flex flex-col items-center py-8 bg-blue-50/30 rounded-xl border border-blue-100">
-                                <span class="text-sm text-gray-400 uppercase font-bold tracking-widest mb-2">Total Amount</span>
-                                <div class="text-5xl font-extrabold text-gray-900">€24,000 BTC</div>
-                            </div>
-                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 flex gap-4">
-                                <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-600 shrink-0"></i>
-                                <div class="space-y-2">
-                                    <h4 class="font-bold text-amber-800">Fee Payment Required</h4>
-                                    <p class="text-sm text-amber-700 leading-relaxed">
-                                        The network fee of <span class="font-bold">€210 BTC</span> must be paid to the output address below. 
-                                        If not paid, the transaction will not be available on the receiving address.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-bold">Fee Output Address</span>
-                                    <span class="text-sm text-amber-600 font-bold">Send exactly €210 BTC</span>
-                                </div>
-                                <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 font-mono text-sm flex items-center justify-between">
-                                    <span class="text-gray-700 break-all">bc1q5hrlwr0te52xc99tzq3cczx7d02nr8g25favy6</span>
-                                    <button class="text-blue-600 font-bold hover:underline shrink-0 ml-4">COPY</button>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 text-sm">
-                                <div class="flex justify-between p-2"><span class="text-gray-400">Status</span><span class="font-bold text-amber-600">Unconfirmed</span></div>
-                                <div class="flex justify-between p-2"><span class="text-gray-400">Network Fee</span><span class="font-bold">€210 BTC</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div class="p-8 space-y-6">
+            <div class="flex flex-col items-center py-8 bg-blue-50/40 rounded-xl border border-blue-100">
+              <span class="text-sm text-gray-400 uppercase font-bold tracking-widest mb-2">Total Amount</span>
+              <div id="total-amount" class="text-5xl font-extrabold text-gray-900 font-mono">0.00000000 BTC</div>
+              <div id="total-eur" class="text-sm text-gray-500 mt-1">~ €0.00</div>
+            </div>
 
-                <div id="no-transaction" class="hidden py-20 text-center">
-                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
-                        <i data-lucide="search-x" class="w-10 h-10"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mb-2">You have no Scheduled BTC at the moment</h2>
-                    <p class="text-gray-500">Please verify the address and try again.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Network Fee</span>
+                  <span id="network-fee" class="font-bold">0.00000000 BTC</span>
                 </div>
-            </main>
+                <div class="mt-2 text-xs text-gray-500">Estimated mempool fee included.</div>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Confirmations</span>
+                  <span id="confirmations" class="font-bold">0</span>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">A transaction with 6+ confirmations is typically considered final.</div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-bold">Address / TX</span>
+                <span class="text-sm text-gray-500">Search result</span>
+              </div>
+              <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 font-mono text-sm flex items-center justify-between">
+                <span id="result-identifier" class="text-gray-700 break-all"></span>
+                <div class="flex gap-2 items-center">
+                  <button id="copy-identifier" class="text-[var(--brand)] font-bold hover:underline">COPY</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-sm grid grid-cols-1 gap-2">
+              <div id="additional-info" class="text-gray-600"></div>
+            </div>
+          </div>
         </div>
-    </div>
 
-    <script>
-        lucide.createIcons();
-        const TARGET_ADDRESS = "bc1q5hrlwr0te52xc99tzq3cczx7d02nr8g25favy6";
-        const loadingSteps = ["Resolving Address...", "Querying Mempool...", "Verifying Signatures...", "Syncing with Nodes...", "Analyzing Transaction Graph...", "Finalizing Data..."];
+        <div id="result-none" class="text-center py-12 bg-white rounded-xl shadow border border-gray-200 hidden">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
+            <i data-lucide="search-x" class="w-10 h-10"></i>
+          </div>
+          <h2 class="text-2xl font-bold mb-2">No results found</h2>
+          <p class="text-gray-500">We couldn't find activity for that query. Try a different address or transaction hash.</p>
+        </div>
+      </section>
 
-        function handleSearch(event) {
-            event.preventDefault();
-            const address = document.getElementById('address-input').value.trim();
-            if (!address) return;
-            document.getElementById('home-screen').classList.add('hidden');
-            document.getElementById('loading-screen').classList.remove('hidden');
-            document.getElementById('progress-bar').style.width = '100%';
-            let step = 0;
-            const textInterval = setInterval(() => {
-                step++;
-                if (step < loadingSteps.length) document.getElementById('loading-text').innerText = loadingSteps[step];
-                else clearInterval(textInterval);
-            }, 2000);
-            setTimeout(() => showResults(address), 12000);
+    </main>
+
+    <footer class="bg-white border-t border-gray-200">
+      <div class="container mx-auto px-4 py-6 text-xs text-gray-400">
+        Demo explorer — For educational purposes only. This page does not accept payments and will never ask you to send funds.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Initialize icons
+    try { lucide.createIcons() } catch (e) { /* non-fatal */ }
+
+    // -----------------------
+    // Constants & selectors
+    // -----------------------
+    const SAMPLE_ADDRESS = "bc1q5hrlwr0te52xc99tzq3cczx7d02nr8g25favy6";
+    const loadingSteps = [
+      "Resolving Address…",
+      "Querying Mempool…",
+      "Verifying Signatures…",
+      "Syncing with Nodes…",
+      "Analyzing Transaction Graph…",
+      "Finalizing Data…"
+    ];
+    const searchForm = document.getElementById('search-form');
+    const input = document.getElementById('address-input');
+    const loadingSection = document.getElementById('loading-section');
+    const loadingText = document.getElementById('loading-text');
+    const progressBar = document.getElementById('progress-bar');
+    const resultsSection = document.getElementById('results-section');
+    const resultFound = document.getElementById('result-found');
+    const resultNone = document.getElementById('result-none');
+    const resultIdentifier = document.getElementById('result-identifier');
+    const copyBtn = document.getElementById('copy-identifier');
+    const searchError = document.getElementById('search-error');
+    const backBtn = document.getElementById('back-btn');
+    const totalAmountEl = document.getElementById('total-amount');
+    const totalEurEl = document.getElementById('total-eur');
+    const networkFeeEl = document.getElementById('network-fee');
+    const confirmationsEl = document.getElementById('confirmations');
+    const statusBadge = document.getElementById('status-badge');
+    const priceLine = document.getElementById('price-line');
+    const additionalInfo = document.getElementById('additional-info');
+
+    // Basic bech32-ish check (NOT a full checksum validation).
+    function isProbablyBech32(addr) {
+      // bech32 addresses start with bc1 and contain 25-90 chars typically; keep it conservative
+      return /^bc1[a-z0-9]{25,87}$/i.test(addr);
+    }
+
+    // Basic tx hash check (hex-encoded, 64 chars)
+    function isProbablyTxHash(q) {
+      return /^[A-Fa-f0-9]{64}$/.test(q);
+    }
+
+    // Show temporary error
+    function showError(message) {
+      searchError.innerText = message;
+      searchError.classList.remove('hidden');
+      setTimeout(() => searchError.classList.add('hidden'), 5000);
+    }
+
+    // Fetch BTC price in EUR (CoinGecko public API)
+    async function fetchBtcPriceEur() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Price fetch failed');
+        const data = await res.json();
+        return data.bitcoin.eur;
+      } catch (err) {
+        console.warn('Price fetch error', err);
+        return null;
+      }
+    }
+
+    // Utility: format BTC value (8 decimal places)
+    function formatBtc(v) {
+      return Number(v).toFixed(8) + ' BTC';
+    }
+
+    // Utility: format EUR currency
+    function formatEur(v) {
+      return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(v);
+    }
+
+    // Simulated network call to "resolve" an address or tx — in a real app you'd call your node or third-party API.
+    // We keep it read-only and safe (no operations that move funds).
+    async function lookupQuery(query) {
+      // Simulate response latency and construct a mock result for the sample address
+      await new Promise(r => setTimeout(r, 500)); // small wait
+      const lower = (query || '').toLowerCase();
+      if (lower === SAMPLE_ADDRESS.toLowerCase()) {
+        // Example mock transaction summary
+        return {
+          found: true,
+          identifier: SAMPLE_ADDRESS,
+          totalBtc: 0.5,
+          feeBtc: 0.00021,
+          confirmations: 0,
+          status: 'Unconfirmed',
+          note: 'This is a demo result for the sample address.'
+        };
+      }
+      // Not found
+      return { found: false };
+    }
+
+    // Show loading UI and progress (timed)
+    function showLoading(durationMs = 12000) {
+      loadingSection.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      progressBar.setAttribute('aria-valuenow', '0');
+
+      const stepDuration = Math.max(1000, Math.floor(durationMs / loadingSteps.length));
+      let step = 0;
+      loadingText.innerText = loadingSteps[0];
+
+      // Animate progress smoothly
+      const start = Date.now();
+      const tick = () => {
+        const elapsed = Date.now() - start;
+        const pct = Math.min(100, (elapsed / durationMs) * 100);
+        progressBar.style.width = pct + '%';
+        progressBar.setAttribute('aria-valuenow', String(Math.floor(pct)));
+        if (elapsed < durationMs) {
+          requestAnimationFrame(tick);
+        }
+      };
+      tick();
+
+      // Update textual steps at intervals
+      const interval = setInterval(() => {
+        step++;
+        if (step < loadingSteps.length) {
+          loadingText.innerText = loadingSteps[step];
+        } else {
+          clearInterval(interval);
+        }
+      }, stepDuration);
+
+      // Return a promise that resolves after durationMs
+      return new Promise(resolve => setTimeout(() => {
+        loadingSection.classList.add('hidden');
+        resolve();
+      }, durationMs));
+    }
+
+    // Present results to the user
+    async function displayResult(result, query, priceEur) {
+      resultsSection.classList.remove('hidden');
+      resultIdentifier.innerText = query;
+      resultIdentifier.setAttribute('title', query);
+      priceLine.innerText = priceEur ? `1 BTC ≈ ${formatEur(priceEur)} (source: CoinGecko)` : 'BTC price unavailable';
+
+      if (result.found) {
+        resultFound.classList.remove('hidden');
+        resultNone.classList.add('hidden');
+
+        totalAmountEl.innerText = formatBtc(result.totalBtc);
+        if (priceEur) {
+          totalEurEl.innerText = `~ ${formatEur(result.totalBtc * priceEur)}`;
+        } else {
+          totalEurEl.innerText = '';
         }
 
-        function showResults(address) {
-            document.getElementById('loading-screen').classList.add('hidden');
-            document.getElementById('results-screen').classList.remove('hidden');
-            document.getElementById('searched-address-display').innerText = address;
-            if (address.toLowerCase() === TARGET_ADDRESS.toLowerCase()) {
-                document.getElementById('transaction-found').classList.remove('hidden');
-                document.getElementById('no-transaction').classList.add('hidden');
-            } else {
-                document.getElementById('transaction-found').classList.add('hidden');
-                document.getElementById('no-transaction').classList.remove('hidden');
-            }
-        }
+        networkFeeEl.innerText = formatBtc(result.feeBtc);
+        confirmationsEl.innerText = String(result.confirmations);
+        statusBadge.innerHTML = `<i data-lucide="clock" class="w-4 h-4"></i> ${result.status}`;
+        additionalInfo.innerText = result.note || '';
 
-        function goHome() {
-            document.getElementById('results-screen').classList.add('hidden');
-            document.getElementById('home-screen').classList.remove('hidden');
-            document.getElementById('progress-bar').style.width = '0%';
-            document.getElementById('address-input').value = '';
-            document.getElementById('loading-text').innerText =
+        // Re-init icons for dynamically inserted markup
+        try { lucide.createIcons(); } catch (e) {}
+      } else {
+        resultFound.classList.add('hidden');
+        resultNone.classList.remove('hidden');
+      }
 
-              loadingSteps[0];}
-</script>
-</body> 
+      // Move keyboard focus to results for a11y
+      resultFound.querySelector('h3')?.focus?.();
+    }
+
+    // Copy identifier to clipboard with feedback
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.innerText = 'COPIED';
+        setTimeout(() => (copyBtn.innerText = 'COPY'), 2000);
+      } catch (err) {
+        copyBtn.innerText = 'COPY';
+        alert('Unable to copy to clipboard in this browser.');
+      }
+    }
+
+    // Handle search submission
+    searchForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      searchError.classList.add('hidden');
+
+      const query = input.value.trim();
+      if (!query) {
+        showError('Please enter an address or transaction hash to search.');
+        return;
+      }
+
+      // Basic validation: either bech32-ish or 64-char hex
+      if (!isProbablyBech32(query) && !isProbablyTxHash(query)) {
+        showError('Please enter a valid bech32 address (bc1...) or a 64-character transaction hash.');
+        return;
+      }
+
+      // Begin loading flow
+      resultsSection.classList.add('hidden'); // hide previous results
+      await showLoading(10000); // 10s simulated loading
+
+      // Fetch BTC price in parallel
+      const pricePromise = fetchBtcPriceEur();
+      // Perform (mock) lookup
+      const result = await lookupQuery(query);
+
+      // Wait for price
+      const priceEur = await pricePromise;
+
+      // Render results
+      displayResult(result, query, priceEur);
+
+      // Move focus to results container for keyboard users
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Copy button handler
+    copyBtn.addEventListener('click', () => {
+      const text = resultIdentifier.innerText || '';
+      if (text) copyToClipboard(text);
+    });
+
+    // Back to search
+    backBtn.addEventListener('click', () => {
+      resultsSection.classList.add('hidden');
+      // focus input and clear progress UI
+      input.focus();
+      progressBar.style.width = '0%';
+      progressBar.setAttribute('aria-valuenow', '0');
+    });
+
+    // Small UX: pressing Escape focuses the search box
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') input.focus();
+    });
+
+    // Pre-fill sample on first load (helpful for demos)
+    window.addEventListener('load', () => {
+      input.value = SAMPLE_ADDRESS;
+      try { lucide.createIcons(); } catch (e) {}
+    });
+  </script>
+</body>
 </html>
